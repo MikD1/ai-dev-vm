@@ -27,7 +27,7 @@ git lfs install --system || true
 
 # Copy gitconfig from host, stripping credential helpers
 if [ -f "${VM_SECRETS}/.gitconfig" ]; then
-  sudo -u "${VM_USER}" bash -c "
-    grep -v -i 'credential\.' '${VM_SECRETS}/.gitconfig' > \"\$HOME/.gitconfig\" || true
-  "
+  sudo -u "${VM_USER}" env VM_SECRETS="${VM_SECRETS}" bash -c '
+    grep -v -i "credential\." "${VM_SECRETS}/.gitconfig" > "$HOME/.gitconfig" || true
+  '
 fi
