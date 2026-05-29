@@ -59,18 +59,6 @@ if limactl list --format '{{.Name}}' 2>/dev/null | grep -qx "$VM_NAME"; then
   exit 1
 fi
 
-# --- Propagate proxy from host secrets if available ---
-
-SECRETS_FILE="$HOME/.config/ai-dev-vm/secrets.env"
-if [ -f "$SECRETS_FILE" ]; then
-  while IFS= read -r line; do
-    case "$line" in
-      HTTP_PROXY=*|HTTPS_PROXY=*|NO_PROXY=*)
-        declare -x "${line%%=*}=${line#*=}" ;;
-    esac
-  done < "$SECRETS_FILE"
-fi
-
 # --- Create VM with project mount ---
 
 TEMP_YAML="$(mktemp)"

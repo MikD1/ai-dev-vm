@@ -12,22 +12,12 @@ brew install lima yq
 
 ## Setup
 
-Create a local secrets directory (not committed to git):
+Create a local config directory (not committed to git):
 
 ```bash
-mkdir -p ~/.config/ai-dev-vm/certs
+mkdir -p ~/.config/ai-dev-vm
 chmod 700 ~/.config/ai-dev-vm
 cp ~/.gitconfig ~/.config/ai-dev-vm/.gitconfig
-```
-
-Create `~/.config/ai-dev-vm/secrets.env` with your API keys:
-
-```bash
-ANTHROPIC_API_KEY=your-key-here
-```
-
-```bash
-chmod 600 ~/.config/ai-dev-vm/secrets.env
 ```
 
 ## Usage
@@ -61,17 +51,11 @@ ssh lima-dev-my-project
 
 VS Code: Remote-SSH → `lima-dev-my-project`
 
-If you use the `claude` module, add this to your VS Code `settings.json` (`Cmd+Shift+P` → **Preferences: Open User Settings (JSON)**) once to auto-install the Claude extension on every remote connection:
-
-```json
-"remote.SSH.defaultExtensions": ["Anthropic.claude-vscode"]
-```
-
 ### 4. Work
 
 ```bash
 cd ~/my-project
-claude-env              # Claude Code with secrets loaded
+claude
 ```
 
 Git inside VM: commit, diff, log, branch, rebase — all local operations.
@@ -92,16 +76,30 @@ Re-create instead of updating:
 ./scripts/create-vm.sh my-project
 ```
 
-## Available Modules
+## Modules
 
 | Module | Description |
 |--------|-------------|
 | `node` | Node.js (latest LTS) + npm + pnpm + yarn |
 | `dotnet` | .NET SDK (latest LTS) |
 | `docker` | Docker CE |
-| `claude` | Claude Code CLI + `claude-env` wrapper |
+| `claude` | Claude Code CLI |
 
 `base` module (git, curl, jq, ripgrep, fd, build-essential) is always installed automatically.
+
+## Module Configuration
+
+### claude
+
+Create `~/.config/ai-dev-vm/modules/claude/settings.json` with your Claude Code settings:
+
+```json
+{
+  "apiKey": "your-key-here"
+}
+```
+
+Claude Code reads this file automatically on startup.
 
 ## Adding a Module
 
@@ -115,6 +113,8 @@ set -euo pipefail
 ```
 
 Then use `<name>` in `.ai-dev-vm.yaml`.
+
+Module config files (if needed) go in `~/.config/ai-dev-vm/modules/<name>/` on the host, accessible inside the module at `$VM_SECRETS/modules/<name>/`.
 
 ## Security
 
