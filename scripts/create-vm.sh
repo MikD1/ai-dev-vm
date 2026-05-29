@@ -61,7 +61,7 @@ fi
 
 # --- Propagate proxy from host secrets if available ---
 
-SECRETS_FILE="$HOME/.config/ai-dev/secrets.env"
+SECRETS_FILE="$HOME/.config/ai-dev-vm/secrets.env"
 if [ -f "$SECRETS_FILE" ]; then
   while IFS= read -r line; do
     case "$line" in
@@ -106,7 +106,7 @@ limactl shell --root "$VM_NAME" bash -c '
   export VM_USER="$1" VM_PROJECT="$2" VM_SECRETS="$3"
   export DEBIAN_FRONTEND=noninteractive
   bash -euo pipefail -s
-' -- "$VM_USER" "$PROJECT_NAME" '/mnt/host/ai-dev' < "$REPO_DIR/modules/base.sh"
+' -- "$VM_USER" "$PROJECT_NAME" '/mnt/host/ai-dev-vm' < "$REPO_DIR/modules/base.sh"
 
 # Run modules from config in order
 while IFS= read -r mod; do
@@ -121,7 +121,7 @@ while IFS= read -r mod; do
     export VM_USER="$1" VM_PROJECT="$2" VM_SECRETS="$3"
     export DEBIAN_FRONTEND=noninteractive
     bash -euo pipefail -s
-  ' -- "$VM_USER" "$PROJECT_NAME" '/mnt/host/ai-dev' < "$MODULE_FILE"
+  ' -- "$VM_USER" "$PROJECT_NAME" '/mnt/host/ai-dev-vm' < "$MODULE_FILE"
 done <<< "$(yq -r '.modules[]' "$CONFIG_FILE" 2>/dev/null || true)"
 
 echo

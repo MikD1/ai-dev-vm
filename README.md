@@ -15,19 +15,19 @@ brew install lima yq
 Create a local secrets directory (not committed to git):
 
 ```bash
-mkdir -p ~/.config/ai-dev/certs
-chmod 700 ~/.config/ai-dev
-cp ~/.gitconfig ~/.config/ai-dev/.gitconfig
+mkdir -p ~/.config/ai-dev-vm/certs
+chmod 700 ~/.config/ai-dev-vm
+cp ~/.gitconfig ~/.config/ai-dev-vm/.gitconfig
 ```
 
-Create `~/.config/ai-dev/secrets.env` with your API keys:
+Create `~/.config/ai-dev-vm/secrets.env` with your API keys:
 
 ```bash
 ANTHROPIC_API_KEY=your-key-here
 ```
 
 ```bash
-chmod 600 ~/.config/ai-dev/secrets.env
+chmod 600 ~/.config/ai-dev-vm/secrets.env
 ```
 
 ## Usage
@@ -60,6 +60,12 @@ ssh lima-dev-my-project
 ```
 
 VS Code: Remote-SSH → `lima-dev-my-project`
+
+If you use the `claude` module, add this to your VS Code `settings.json` (`Cmd+Shift+P` → **Preferences: Open User Settings (JSON)**) once to auto-install the Claude extension on every remote connection:
+
+```json
+"remote.SSH.defaultExtensions": ["Anthropic.claude-vscode"]
+```
 
 ### 4. Work
 

@@ -13,8 +13,8 @@ disk: "120GiB"
 mountType: "virtiofs"
 
 mounts:
-  - location: "~/.config/ai-dev"
-    mountPoint: "/mnt/host/ai-dev"
+  - location: "~/.config/ai-dev-vm"
+    mountPoint: "/mnt/host/ai-dev-vm"
     writable: false
 
 ssh:

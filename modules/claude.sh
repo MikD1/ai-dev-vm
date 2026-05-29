@@ -15,9 +15,9 @@ sudo -u "${VM_USER}" bash -c '
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [ -f /mnt/host/ai-dev/secrets.env ]; then
+if [ -f /mnt/host/ai-dev-vm/secrets.env ]; then
   set -a
-  source /mnt/host/ai-dev/secrets.env
+  source /mnt/host/ai-dev-vm/secrets.env
   set +a
 fi
 
@@ -41,9 +41,9 @@ sudo -u "${VM_USER}" bash -c '
 export PATH="$HOME/.local/bin:$PATH"
 
 claude-env() (
-  if [ -f /mnt/host/ai-dev/secrets.env ]; then
+  if [ -f /mnt/host/ai-dev-vm/secrets.env ]; then
     set -a
-    source /mnt/host/ai-dev/secrets.env
+    source /mnt/host/ai-dev-vm/secrets.env
     set +a
   fi
   command claude "$@"
