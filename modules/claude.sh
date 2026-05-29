@@ -24,14 +24,15 @@ WRAPPEREOF
   chmod +x "$HOME/.local/bin/with-ai-env"
 '
 
-# Add claude-env alias and PATH to shell rc files
-BLOCK_MARKER="# ai-dev-vm:claude"
+# Add claude-env function and PATH to shell rc files
+sudo -u "${VM_USER}" bash -c '
+  BLOCK_MARKER="# ai-dev-vm:claude"
 
-add_rc_block() {
-  local rc_file="$1"
-  [ -f "$rc_file" ] || return 0
-  grep -qF "$BLOCK_MARKER" "$rc_file" && return 0
-  cat >> "$rc_file" <<'RCEOF'
+  add_rc_block() {
+    local rc_file="$1"
+    [ -f "$rc_file" ] || return 0
+    grep -qF "$BLOCK_MARKER" "$rc_file" && return 0
+    cat >> "$rc_file" <<'"'"'RCEOF'"'"'
 
 # ai-dev-vm:claude
 export PATH="$HOME/.local/bin:$PATH"
@@ -45,11 +46,8 @@ claude-env() (
   command claude "$@"
 )
 RCEOF
-}
+  }
 
-sudo -u "${VM_USER}" bash -c "
-  $(declare -f add_rc_block)
-  BLOCK_MARKER='# ai-dev-vm:claude'
-  add_rc_block \"\$HOME/.bashrc\"
-  add_rc_block \"\$HOME/.zshrc\"
-"
+  add_rc_block "$HOME/.bashrc"
+  add_rc_block "$HOME/.zshrc"
+'
