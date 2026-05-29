@@ -1,0 +1,7 @@
+local/
+*.local.yaml
+*.env
+*.pem
+*.key
+*.crt
+.DS_Store
