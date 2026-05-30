@@ -101,6 +101,14 @@ Create `~/.config/ai-dev-vm/modules/claude/settings.json` with your Claude Code 
 
 Claude Code reads this file automatically on startup.
 
+To pre-install plugins, create `~/.config/ai-dev-vm/modules/claude/plugins` with one plugin name per line:
+
+```
+superpowers
+```
+
+Lines starting with `#` are ignored.
+
 ## Adding a Module
 
 Create `modules/<name>.sh` following the module contract:

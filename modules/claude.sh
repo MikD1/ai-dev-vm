@@ -15,3 +15,13 @@ if [ -f "$CLAUDE_CONFIG" ]; then
     cp '$CLAUDE_CONFIG' \"\$HOME/.claude/settings.json\"
   "
 fi
+
+# Install plugins if list provided
+PLUGINS_FILE="${VM_SECRETS}/modules/claude/plugins"
+if [ -f "$PLUGINS_FILE" ]; then
+  while IFS= read -r plugin || [ -n "$plugin" ]; do
+    [[ -z "$plugin" || "$plugin" =~ ^# ]] && continue
+    echo "Installing Claude plugin: $plugin"
+    sudo -u "${VM_USER}" claude plugins install "$plugin" || true
+  done < "$PLUGINS_FILE"
+fi
