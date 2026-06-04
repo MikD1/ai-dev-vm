@@ -66,7 +66,21 @@ trap 'rm -f "$TEMP_YAML"' EXIT
 
 cp "$REPO_DIR/base.yaml" "$TEMP_YAML"
 
-MOUNT_POINT="~/${PROJECT_NAME}"
+# Derive a valid Linux username from the host username following Lima's rules
+VM_USER="$(id -un)"
+VM_USER="$(printf '%s' "$VM_USER" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9_-' '_')"
+[[ "$VM_USER" =~ ^[a-z_] ]] || VM_USER="_${VM_USER}"
+VM_USER="${VM_USER:0:32}"
+[[ -n "$VM_USER" ]] || VM_USER="lima"
+
+LIMA_INFO="$(limactl info)"
+DEFAULT_HOME="$(printf '%s' "$LIMA_INFO" | yq -r '.defaultTemplate.user.home')"
+DEFAULT_USER="$(printf '%s' "$LIMA_INFO" | yq -r '.defaultTemplate.user.name')"
+[[ -n "$DEFAULT_HOME" && "$DEFAULT_HOME" != "null" ]] || { echo "Error: could not resolve guest home directory from limactl info"; exit 1; }
+GUEST_HOME="${DEFAULT_HOME/$DEFAULT_USER/$VM_USER}"
+MOUNT_POINT="${GUEST_HOME}/${PROJECT_NAME}"
+
+yq -i ".user.name = \"$VM_USER\" | .user.home = \"$GUEST_HOME\"" "$TEMP_YAML"
 
 yq -i ".mounts += [{
   \"location\": \"$HOST_PROJECT_PATH\",
@@ -110,6 +124,9 @@ while IFS= read -r mod; do
     bash -euo pipefail -s
   ' -- "$VM_USER" "$PROJECT_NAME" '/mnt/host/ai-dev-vm' < "$MODULE_FILE"
 done <<< "$(yq -r '.modules[]' "$CONFIG_FILE" 2>/dev/null || true)"
+
+echo "Restarting VM to apply group changes: $VM_NAME"
+limactl restart "$VM_NAME"
 
 echo
 echo "VM ready: $VM_NAME"
