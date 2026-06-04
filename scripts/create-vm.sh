@@ -66,8 +66,7 @@ trap 'rm -f "$TEMP_YAML"' EXIT
 
 cp "$REPO_DIR/base.yaml" "$TEMP_YAML"
 
-# Lima 2.x guest home is /home/${USER}.guest (also accessible via .linux alias)
-MOUNT_POINT="/home/${USER}.guest/${PROJECT_NAME}"
+MOUNT_POINT="~/${PROJECT_NAME}"
 
 yq -i ".mounts += [{
   \"location\": \"$HOST_PROJECT_PATH\",

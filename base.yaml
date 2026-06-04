@@ -1,7 +1,7 @@
 minimumLimaVersion: "2.1.0"
 
 base:
-  - template:ubuntu
+  - template:_images/ubuntu
 
 vmType: "vz"
 arch: "default"
