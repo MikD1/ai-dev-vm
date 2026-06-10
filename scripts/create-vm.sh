@@ -88,6 +88,20 @@ yq -i ".mounts += [{
   \"writable\": true
 }]" "$TEMP_YAML"
 
+# --- Apply per-project resource overrides ---
+# Any field omitted from .ai-dev-vm.yaml keeps the default from base.yaml.
+# Values are passed through to Lima as-is; invalid values fail at create/start.
+
+RES_CPUS="$(yq -r '.resources.cpus // ""' "$CONFIG_FILE" 2>/dev/null || true)"
+RES_MEMORY="$(yq -r '.resources.memory // ""' "$CONFIG_FILE" 2>/dev/null || true)"
+RES_DISK="$(yq -r '.resources.disk // ""' "$CONFIG_FILE" 2>/dev/null || true)"
+
+[[ -n "$RES_CPUS" && "$RES_CPUS" != "null" ]] && yq -i ".cpus = $RES_CPUS" "$TEMP_YAML"
+[[ -n "$RES_MEMORY" && "$RES_MEMORY" != "null" ]] && yq -i ".memory = \"$RES_MEMORY\"" "$TEMP_YAML"
+[[ -n "$RES_DISK" && "$RES_DISK" != "null" ]] && yq -i ".disk = \"$RES_DISK\"" "$TEMP_YAML"
+
+echo "Resources: cpus=$(yq -r '.cpus' "$TEMP_YAML") memory=$(yq -r '.memory' "$TEMP_YAML") disk=$(yq -r '.disk' "$TEMP_YAML")"
+
 echo "Creating VM: $VM_NAME"
 limactl create --name="$VM_NAME" --tty=false "$TEMP_YAML"
 

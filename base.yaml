@@ -6,8 +6,8 @@ base:
 vmType: "vz"
 arch: "default"
 
-cpus: 6
-memory: "8GiB"
+cpus: 4
+memory: "4GiB"
 disk: "120GiB"
 
 mountType: "virtiofs"

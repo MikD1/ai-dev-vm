@@ -78,6 +78,18 @@ modules:
   - claude
 ```
 
+Optionally customize VM resources (any field omitted falls back to the defaults):
+
+```yaml
+modules:
+  - node
+  - claude
+resources:
+  cpus: 8        # default: 4
+  memory: 16GiB  # default: 4GiB
+  disk: 200GiB   # default: 120GiB
+```
+
 ### 2. Create a VM
 
 ```bash
@@ -137,6 +149,19 @@ Re-create instead of updating:
 | `claude` | Claude Code CLI |
 
 `base` module (git, curl, jq, ripgrep, fd, build-essential) is always installed automatically.
+
+## Resource Customization
+
+By default each VM gets 4 CPUs, 4GiB memory, and a 120GiB disk. Override any of these per-project with a `resources:` block in `.ai-dev-vm.yaml`:
+
+```yaml
+resources:
+  cpus: 8
+  memory: 16GiB
+  disk: 200GiB
+```
+
+Each field is optional; omitted fields keep the default. Values are passed straight to Lima, so use Lima's formats (a plain integer for `cpus`, a size string like `16GiB` for `memory`/`disk`). To change resources on an existing VM, re-create it (`delete-vm.sh` then `create-vm.sh`).
 
 ## Custom CA Certificates
 
