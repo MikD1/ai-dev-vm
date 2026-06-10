@@ -18,19 +18,14 @@ From the cloned repo:
 ./install.sh
 ```
 
-This checks for `brew`/`lima`/`yq` (and tells you what to install if anything is missing), creates `~/.config/ai-dev-vm` (mode 700), copies your `~/.gitconfig` into it, and symlinks `vm` into `~/.local/bin`. If `~/.local/bin` isn't on your `PATH`, the installer prints the line to add.
-
-The CLI runs directly from the clone — keep the repo in place and `git pull` to update.
-
 ## Quick Start
 
 ```bash
-cd ~/Projects/my-project
-vm init            # 1. write .ai-dev-vm.yaml
-$EDITOR .ai-dev-vm.yaml   # 2. uncomment the modules you need
-vm create          # 3. build + start the VM
-vm shell           # 4. connect
-vm stop            # 5. ...
+cd ~/projects/my-project
+vm init
+# edit .ai-dev-vm.yaml
+vm create
+vm shell
 ```
 
 Run inside a project directory (one containing `.ai-dev-vm.yaml`) and `vm` uses that project automatically — the VM name is the directory's basename. You can also target any VM by name from anywhere, e.g. `vm shell my-project`.
@@ -60,9 +55,9 @@ To change a VM's resources or modules, re-create it: `vm delete <name>` then `vm
 
 ```mermaid
 graph TB
-    subgraph Host["macOS Host"]
+    subgraph Host["Host"]
         config["~/.config/ai-dev-vm/<br/>(secrets &amp; module configs)"]
-        project["~/Projects/my-project/<br/>.ai-dev-vm.yaml"]
+        project["~/projects/my-project/<br/>.ai-dev-vm.yaml"]
         cli["vm create"]
     end
 
@@ -181,5 +176,5 @@ Module config files (if needed) go in `~/.config/ai-dev-vm/modules/<name>/` on t
 
 - Each project is isolated in its own VM
 - Secrets mounted read-only from host, loaded only in subshells
-- Git credentials stay on macOS — no duplication
+- Git credentials stay on host — no duplication
 - SSH agent forwarding disabled
