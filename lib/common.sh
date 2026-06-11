@@ -56,7 +56,13 @@ resolve_target_name() {
 }
 
 vm_exists() {
-  limactl list --format '{{.Name}}' 2>/dev/null | grep -qx "$1"
+  # Capture output first, then match. Piping limactl straight into `grep -q`
+  # lets grep short-circuit on a match and close the pipe, killing limactl with
+  # SIGPIPE; under `set -o pipefail` that turns the whole pipeline non-zero, so
+  # an existing VM is falsely reported as missing.
+  local names
+  names="$(limactl list --format '{{.Name}}' 2>/dev/null)"
+  grep -qxF -- "$1" <<<"$names"
 }
 
 # Run a module script inside the VM as root via stdin.
