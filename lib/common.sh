@@ -32,15 +32,35 @@ preflight() {
   command -v yq >/dev/null 2>&1 || die "yq not found. Install with: brew install yq"
 }
 
+# Normalize a raw name (e.g. a directory basename) into a Lima-valid lowercase
+# DNS label: lowercase, every char outside [a-z0-9-] becomes '-', then strip
+# leading/trailing '-'. Dies if nothing valid remains.
+normalize_name() {
+  local n
+  n="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-' '-')"
+  n="${n#"${n%%[!-]*}"}"   # strip leading hyphens
+  n="${n%"${n##*[!-]}"}"   # strip trailing hyphens
+  if [[ -z "$n" ]]; then
+    printf 'Error: cannot derive a valid VM name from: %s\n' "$1" >&2
+    return 1
+  fi
+  printf '%s' "$n"
+}
+
+# Assert a name is a valid Lima instance name (lowercase DNS label). Safety net:
+# callers should pass names through normalize_name first.
 validate_name() {
-  [[ "$1" =~ ^[a-zA-Z0-9_-]+$ ]] || die "project name must contain only letters, digits, hyphens, or underscores: $1"
+  if ! [[ "$1" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$ ]]; then
+    printf 'Error: VM name must be a lowercase DNS label (a-z, 0-9, hyphen; not starting or ending with '"'"'-'"'"'): %s\n' "$1" >&2
+    return 1
+  fi
 }
 
 # Resolve the VM name when no argument was given: require .ai-dev-vm.yaml in cwd.
 resolve_name_from_cwd() {
   [[ -f "$PWD/.ai-dev-vm.yaml" ]] || die "no .ai-dev-vm.yaml in current directory; pass a project name or cd into a project"
   local name
-  name=$(basename "$PWD")
+  name="$(normalize_name "$(basename "$PWD")")"
   validate_name "$name"
   printf '%s' "$name"
 }
@@ -49,7 +69,7 @@ resolve_name_from_cwd() {
 resolve_target_name() {
   local name="${1:-}"
   if [[ -n "$name" ]]; then
-    printf '%s' "$name"
+    normalize_name "$name"
   else
     resolve_name_from_cwd
   fi
