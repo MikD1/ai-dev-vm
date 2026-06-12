@@ -61,7 +61,7 @@ resolve_name_from_cwd() {
   [[ -f "$PWD/.ai-dev-vm.yaml" ]] || die "no .ai-dev-vm.yaml in current directory; pass a project name or cd into a project"
   local name
   name="$(normalize_name "$(basename "$PWD")")"
-  validate_name "$name"
+  validate_name "$name"  # defense-in-depth: normalize_name output should always pass
   printf '%s' "$name"
 }
 
