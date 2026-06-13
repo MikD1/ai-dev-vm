@@ -36,7 +36,7 @@ vm create
 vm shell
 ```
 
-Run inside a project directory (one containing `.ai-dev-vm.yaml`) and `vm` uses that project automatically — the VM name is the directory's basename. You can also target any VM by name from anywhere, e.g. `vm shell my-project`.
+Run inside a project directory (one containing `.ai-dev-vm.yaml`) and `vm` uses that project automatically — the VM name is the directory's basename. You can also target any VM by name from anywhere, e.g. `vm shell my-project`. The name is normalized to a lowercase DNS label (Lima's requirement): uppercase becomes lowercase and other characters become hyphens, so a directory named `My_Project` yields the VM name `my-project`.
 
 ## Commands
 
@@ -147,15 +147,17 @@ cp your-corp-ca.pem ~/.config/ai-dev-vm/ca-certificates/
 
 ### claude
 
-Create `~/.config/ai-dev-vm/modules/claude/settings.json` with your Claude Code settings:
+Create `~/.config/ai-dev-vm/modules/claude/settings.json` with your Claude Code settings. To supply an API key, use the `env` block:
 
 ```json
 {
-  "apiKey": "your-key-here"
+  "env": {
+    "ANTHROPIC_API_KEY": "your-key-here"
+  }
 }
 ```
 
-Claude Code reads this file automatically on startup.
+`settings.json` holds general Claude Code settings — there is no `apiKey` field. Provide the key via the `ANTHROPIC_API_KEY` environment variable (as in the `env` block above), or via `apiKeyHelper` for a command-sourced key that isn't stored in plaintext.
 
 To pre-install plugins, create `~/.config/ai-dev-vm/modules/claude/plugins` with one plugin name per line:
 
