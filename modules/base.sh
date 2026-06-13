@@ -28,16 +28,24 @@ git lfs install --system || true
 # Install custom CA certificates if provided
 CA_DIR="${VM_SECRETS}/ca-certificates"
 if [ -d "$CA_DIR" ]; then
+  CA_BUNDLE=/etc/ssl/certs/custom-ca-bundle.pem
+  : > "$CA_BUNDLE.tmp"
+  ca_found=0
   for cert in "$CA_DIR"/*.pem; do
-    [ -f "$cert" ] || continue
+    [ -f "$cert" ] || continue   # empty dir / no *.pem: glob stays literal, skip it
+    ca_found=1
     cp "$cert" "/usr/local/share/ca-certificates/$(basename "$cert" .pem).crt"
+    cat "$cert" >> "$CA_BUNDLE.tmp"
   done
-  update-ca-certificates
-  # Node.js/npm uses its own CA bundle; point it to the system bundle
-  cat "$CA_DIR"/*.pem > /etc/ssl/certs/custom-ca-bundle.pem
-  echo "export NODE_EXTRA_CA_CERTS=/etc/ssl/certs/custom-ca-bundle.pem" \
-    > /etc/profile.d/custom-ca.sh
-  export NODE_EXTRA_CA_CERTS=/etc/ssl/certs/custom-ca-bundle.pem
+  if [ "$ca_found" = 1 ]; then
+    update-ca-certificates
+    mv "$CA_BUNDLE.tmp" "$CA_BUNDLE"
+    # Node.js/npm uses its own CA bundle; point it to the system bundle
+    echo "export NODE_EXTRA_CA_CERTS=$CA_BUNDLE" > /etc/profile.d/custom-ca.sh
+    export NODE_EXTRA_CA_CERTS="$CA_BUNDLE"
+  else
+    rm -f "$CA_BUNDLE.tmp"
+  fi
 fi
 
 # Copy gitconfig from host, stripping credential helpers
